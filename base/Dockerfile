@@ -182,7 +182,6 @@ RUN set -eux; \
     sudo DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
         bash-completion \
         htop \
-        ntp \
         tree \
         tzdata \
         xclip;
