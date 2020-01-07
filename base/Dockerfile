@@ -20,6 +20,7 @@ RUN set -eux; \
         autoconf \
 		automake \
 		bzip2 \
+        clang \
 		dpkg-dev \
 		file \
 		g++ \
@@ -120,7 +121,7 @@ RUN set -eux; \
     curl -O "https://static.rust-lang.org/rustup/archive/$RUSTUP_VERSION/x86_64-unknown-linux-gnu/rustup-init"; \
     echo "$RUSTUP_HASH *rustup-init" | sha256sum -c -; \
     chmod +x rustup-init; \
-    ./rustup-init -y --no-modify-path --profile minimal --default-toolchain $RUST_VERSION; \
+    ./rustup-init -y --no-modify-path --default-toolchain $RUST_VERSION; \
     rm rustup-init; \
     rustup --version; \
     cargo --version; \
@@ -160,6 +161,9 @@ RUN set -eux; \
     pip3 install -U pip;
 
 RUN set -eux; \
+    cargo install bat cargo-update exa fd-find ripgrep;
+
+RUN set -eux; \
     sudo mkdir -p /usr/local/opt; \
     cd /usr/local/opt; \
     sudo curl -LO https://github.com/neovim/neovim/releases/download/stable/nvim.appimage; \
@@ -170,6 +174,24 @@ RUN set -eux; \
     sudo ln -s /usr/local/opt/neovim/usr/bin/nvim /usr/local/bin/nvim; \
     sudo pip2 install pynvim; \
     sudo pip3 install pynvim; \
-    yarn global add neovim; \
-    echo "alias c=clear" >> /home/alice/.bashrc; \
-    echo "alias ls=\"ls -al\"" >> /home/alice/.bashrc;
+    yarn global add neovim;
+
+RUN set -eux; \
+    sudo apt-get update; \
+    sudo apt-get upgrade -y; \
+    sudo DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+        bash-completion \
+        htop \
+        ntp \
+        tree \
+        tzdata \
+        xclip;
+
+COPY --chown=alice:root .bash_logout /home/alice/.bash_logout
+COPY --chown=alice:root .bash_profile /home/alice/.bash_profile
+COPY --chown=alice:root .bashrc /home/alice/.bashrc
+COPY --chown=alice:root .config/nvim /home/alice/.config/nvim
+COPY --chown=alice:root .inputrc /home/alice/.inputrc
+COPY --chown=alice:root .profile /home/alice/.profile
+COPY --chown=alice:root .vim /home/alice/.vim
+COPY --chown=alice:root .vimrc /home/alice/.vimrc
